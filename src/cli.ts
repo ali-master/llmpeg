@@ -11,13 +11,14 @@ import { vice } from "gradient-string";
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
+import packageJSON from "../package.json" assert { type: "json" };
 
 const program = new Command();
 
 program
   .name("llmpeg")
   .description("Generate FFmpeg commands using AI models")
-  .version("1.0.0")
+  .version(packageJSON.version, "--version", "Show version information")
   .option(
     "-m, --model <model>",
     "AI model to use (openai, claude, gemini, grok)",
