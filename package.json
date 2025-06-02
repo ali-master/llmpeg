@@ -19,6 +19,7 @@
     "url": "https://github.com/yourusername/llmpeg/issues"
   },
   "homepage": "https://github.com/yourusername/llmpeg#readme",
+  "logo": "https://raw.githubusercontent.com/yourusername/llmpeg/main/assets/logo.svg",
   "engines": {
     "node": ">=18.0.0"
   },

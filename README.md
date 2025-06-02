@@ -1,6 +1,10 @@
-# LLmpeg 🎥✨
+<div align="center">
+  <img src="assets/logo.svg" alt="LLmpeg Logo" width="200" height="200">
+  
+  # LLmpeg 🎥✨
 
-> Generate FFmpeg commands using AI models (OpenAI, Claude, Gemini, Grok)
+  > Generate FFmpeg commands using AI models (OpenAI, Claude, Gemini, Grok)
+</div>
 
 LLmpeg is a powerful command-line tool that uses AI to generate FFmpeg commands from natural language descriptions. Simply describe what you want to do with your video/audio files, and LLmpeg will generate the appropriate FFmpeg command for you.
 
@@ -280,8 +284,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 If you encounter any issues or have questions:
 - Open an issue on GitHub
 - Check the [documentation](https://github.com/yourusername/llmpeg/wiki)
-- Join our [Discord community](https://discord.gg/llmpeg)
 
 ---
 
-Made with ❤️ by developers, for developers. Happy encoding! 🎬
+Made with ❤️ by [Ali Torki](https://github.com/ali-master), for developers. Happy encoding! 🎬

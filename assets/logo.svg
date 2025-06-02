@@ -1,0 +1,39 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="90" fill="url(#gradient1)"/>
+  
+  <!-- Neural Network Nodes -->
+  <g opacity="0.3">
+    <circle cx="50" cy="50" r="4" fill="white"/>
+    <circle cx="150" cy="50" r="4" fill="white"/>
+    <circle cx="50" cy="150" r="4" fill="white"/>
+    <circle cx="150" cy="150" r="4" fill="white"/>
+    <circle cx="40" cy="100" r="4" fill="white"/>
+    <circle cx="160" cy="100" r="4" fill="white"/>
+    <circle cx="100" cy="40" r="4" fill="white"/>
+    <circle cx="100" cy="160" r="4" fill="white"/>
+    
+    <!-- Connection Lines -->
+    <path d="M50 50 L100 100 M150 50 L100 100 M50 150 L100 100 M150 150 L100 100 M40 100 L100 100 M160 100 L100 100 M100 40 L100 100 M100 160 L100 100" stroke="white" stroke-width="1" opacity="0.5"/>
+  </g>
+  
+  <!-- Play Button -->
+  <path d="M75 65 L75 135 L135 100 Z" fill="white" opacity="0.9"/>
+  
+  <!-- Film Strip Elements -->
+  <g opacity="0.6">
+    <rect x="60" y="55" width="8" height="8" rx="1" fill="white"/>
+    <rect x="60" y="137" width="8" height="8" rx="1" fill="white"/>
+    <rect x="132" y="55" width="8" height="8" rx="1" fill="white"/>
+    <rect x="132" y="137" width="8" height="8" rx="1" fill="white"/>
+  </g>
+  
+  <!-- Gradient Definitions -->
+  <defs>
+    <linearGradient id="gradient1" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="50%" stop-color="#764ba2"/>
+      <stop offset="100%" stop-color="#f093fb"/>
+    </linearGradient>
+  </defs>
+</svg>

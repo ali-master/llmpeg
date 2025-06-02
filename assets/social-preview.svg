@@ -1,0 +1,109 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!--Background Gradient-->
+  <rect width="1280" height="640" fill="url(#bgGradient)"/>
+  <!--Decorative Grid Pattern-->
+  <g opacity="0.05">
+    <pattern id="grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="40" height="40" fill="none" stroke="white" stroke-width="1"/>
+    </pattern>
+    <rect width="1280" height="640" fill="url(#grid)"/>
+  </g>
+  <!--Neural Network Background Elements-->
+  <g opacity="0.1">
+    <!--Left side neurons-->
+    <circle cx="100" cy="100" r="8" fill="white"/>
+    <circle cx="200" cy="200" r="8" fill="white"/>
+    <circle cx="150" cy="320" r="8" fill="white"/>
+    <circle cx="250" cy="420" r="8" fill="white"/>
+    <circle cx="100" cy="520" r="8" fill="white"/>
+    <!--Right side neurons-->
+    <circle cx="1180" cy="120" r="8" fill="white"/>
+    <circle cx="1080" cy="220" r="8" fill="white"/>
+    <circle cx="1130" cy="340" r="8" fill="white"/>
+    <circle cx="1030" cy="440" r="8" fill="white"/>
+    <circle cx="1180" cy="540" r="8" fill="white"/>
+    <!--Connection lines-->
+    <path d="M100 100 L200 200 M200 200 L150 320 M150 320 L250 420 M250 420 L100 520" stroke="white" stroke-width="2" opacity="0.5"/>
+    <path d="M1180 120 L1080 220 M1080 220 L1130 340 M1130 340 L1030 440 M1030 440 L1180 540" stroke="white" stroke-width="2" opacity="0.5"/>
+  </g>
+  <!--Logo Container-->
+  <g transform="translate(540, 80)">
+    <!--Logo Background Circle-->
+    <circle cx="100" cy="100" r="90" fill="url(#logoGradient)" opacity="0.9"/>
+    <!--Neural Network Nodes-->
+    <g opacity="0.4">
+      <circle cx="50" cy="50" r="4" fill="white"/>
+      <circle cx="150" cy="50" r="4" fill="white"/>
+      <circle cx="50" cy="150" r="4" fill="white"/>
+      <circle cx="150" cy="150" r="4" fill="white"/>
+      <circle cx="40" cy="100" r="4" fill="white"/>
+      <circle cx="160" cy="100" r="4" fill="white"/>
+      <circle cx="100" cy="40" r="4" fill="white"/>
+      <circle cx="100" cy="160" r="4" fill="white"/>
+      <path d="M50 50 L100 100 M150 50 L100 100 M50 150 L100 100 M150 150 L100 100" stroke="white" stroke-width="1" opacity="0.6"/>
+    </g>
+    <!--Play Button-->
+    <path d="M75 65 L75 135 L135 100 Z" fill="white"/>
+    <!--Film Strip Elements-->
+    <g opacity="0.7">
+      <rect x="60" y="55" width="8" height="8" rx="1" fill="white"/>
+      <rect x="60" y="137" width="8" height="8" rx="1" fill="white"/>
+      <rect x="132" y="55" width="8" height="8" rx="1" fill="white"/>
+      <rect x="132" y="137" width="8" height="8" rx="1" fill="white"/>
+    </g>
+  </g>
+  <!--Title-->
+  <text x="640" y="380" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="72" font-weight="bold">LLmpeg</text>
+  <!--Tagline-->
+  <text x="640" y="430" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="28" opacity="0.9">AI-Powered FFmpeg Command Generator</text>
+  <!--Description-->
+  <text x="640" y="480" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="20" opacity="0.7">Describe your video task in plain English, get the perfect FFmpeg command instantly</text>
+  <!--Feature Icons-->
+  <g transform="translate(290, 530)">
+    <!--AI Icon-->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="40" height="40" rx="8" fill="white" opacity="0.2"/>
+      <text x="20" y="28" text-anchor="middle" fill="white" font-size="20">🤖</text>
+    </g>
+    <!--Video Icon-->
+    <g transform="translate(200, 0)">
+      <rect x="0" y="0" width="40" height="40" rx="8" fill="white" opacity="0.2"/>
+      <text x="20" y="28" text-anchor="middle" fill="white" font-size="20">🎥</text>
+    </g>
+    <!--Terminal Icon-->
+    <g transform="translate(400, 0)">
+      <rect x="0" y="0" width="40" height="40" rx="8" fill="white" opacity="0.2"/>
+      <text x="20" y="28" text-anchor="middle" fill="white" font-size="20">💻</text>
+    </g>
+    <!--Magic Icon-->
+    <g transform="translate(600, 0)">
+      <rect x="0" y="0" width="40" height="40" rx="8" fill="white" opacity="0.2"/>
+      <text x="20" y="28" text-anchor="middle" fill="white" font-size="20">✨</text>
+    </g>
+  </g>
+  <!--Feature Labels-->
+  <text x="320" y="595" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" opacity="0.8">Multi AI</text>
+  <text x="520" y="595" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" opacity="0.8">FFmpeg</text>
+  <text x="720" y="595" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" opacity="0.8">CLI Tool</text>
+  <text x="920" y="595" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" opacity="0.8">Simple</text>
+  <!--Corner Decoration-->
+  <g opacity="0.1">
+    <path d="M0 0 L200 0 L0 200 Z" fill="white"/>
+    <path d="M1280 640 L1080 640 L1280 440 Z" fill="white"/>
+  </g>
+  <!--Gradients-->
+  <defs>
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="25%" stop-color="#16213e"/>
+      <stop offset="50%" stop-color="#0f3460"/>
+      <stop offset="75%" stop-color="#533483"/>
+      <stop offset="100%" stop-color="#e94560"/>
+    </linearGradient>
+    <linearGradient id="logoGradient" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="50%" stop-color="#764ba2"/>
+      <stop offset="100%" stop-color="#f093fb"/>
+    </linearGradient>
+  </defs>
+</svg>
