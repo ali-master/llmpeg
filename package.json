@@ -1,6 +1,6 @@
 {
   "name": "@usex/llmpeg",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "AI-powered FFmpeg command generator. Describe your video task in plain English, get the perfect FFmpeg command instantly.",
   "type": "module",
   "module": "src/index.ts",
@@ -42,7 +42,9 @@
   "homepage": "https://github.com/ali-master/llmpeg#readme",
   "logo": "https://raw.githubusercontent.com/ali-master/llmpeg/master/assets/logo.svg",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0",
+    "npm": ">=8.0.0"
   },
   "scripts": {
     "prebuild": "bunx rimraf dist",
@@ -53,6 +55,12 @@
     "postbuild": "chmod +x dist/cli.js",
     "start:dev": "bun --bun run src/index.ts",
     "start:cli:dev": "bun --bun run src/cli.ts",
+    "prepublish:next": "bun run build",
+    "publish:next": "bun publish --access public --tag next",
+    "prepublish:npm": "bun run build",
+    "publish:npm": "bun publish --access public",
+    "prerelease": "bun run build",
+    "release": "release-it",
     "test:types": "tsc --noEmit",
     "format": "prettier --write \"**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\"",
@@ -62,11 +70,12 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.13.2",
     "@types/bun": "latest",
+    "@types/inquirer": "^9.0.8",
     "@types/figlet": "^1.7.0",
     "eslint": "^9.28.0",
     "eslint-plugin-format": "^1.0.1",
     "prettier": "^3.5.3",
-    "@types/inquirer": "^9.0.8"
+    "release-it": "^19.0.3"
   },
   "peerDependencies": {
     "typescript": "^5.7.3"
@@ -85,5 +94,20 @@
     "inquirer": "^12.6.3",
     "ora": "^8.2.0"
   },
-  "packageManager": "bun@1.2.15"
+  "packageManager": "bun@1.2.15",
+  "changelog": {
+    "labels": {
+      "feature": "Features",
+      "bug": "Bug fixes",
+      "enhancement": "Enhancements",
+      "docs": "Docs",
+      "dependencies": "Dependencies",
+      "type: code style": "Code style tweaks",
+      "status: blocked": "Breaking changes",
+      "breaking change": "Breaking changes"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
