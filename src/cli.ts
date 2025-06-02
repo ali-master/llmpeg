@@ -1,10 +1,11 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
 import { generateFfmpegCommand } from "./index.js";
 import { configManager } from "./config.js";
+import { copyToClipboard } from "./clipboard.js";
 import figlet from "figlet";
 import { vice } from "gradient-string";
 
@@ -43,21 +44,40 @@ program
       console.log(`\n${chalk.cyan("Prompt:")} ${prompt}`);
       console.log(`${chalk.green("Command:")} ${chalk.bold(command)}`);
 
-      if (options.copy) {
-        const proc = Bun.spawn(["pbcopy"], {
-          stdin: new TextEncoder().encode(command),
-        });
-        await proc.exited;
-        console.log(chalk.yellow("\n✓ Command copied to clipboard"));
+      // Check if we should copy to clipboard (explicit flag or auto-copy config)
+      const shouldCopy =
+        options.copy || (options.copy !== false && configManager.getAutoCopy());
+
+      if (shouldCopy) {
+        try {
+          await copyToClipboard(command);
+          console.log(chalk.yellow("\n✓ Command copied to clipboard"));
+        } catch (error) {
+          console.log(
+            chalk.red("\n✗ Failed to copy to clipboard:"),
+            (error as Error).message,
+          );
+        }
       }
 
       if (options.execute) {
         console.log(chalk.yellow("\nExecuting command..."));
-        const proc = Bun.spawn(command.split(" "), {
-          stdout: "inherit",
-          stderr: "inherit",
+        const { spawn } = await import("child_process");
+        const proc = spawn(command.split(" ")[0], command.split(" ").slice(1), {
+          stdio: "inherit",
+          shell: true,
         });
-        await proc.exited;
+
+        await new Promise((resolve, reject) => {
+          proc.on("close", (code) => {
+            if (code === 0) {
+              resolve(code);
+            } else {
+              reject(new Error(`Command exited with code ${code}`));
+            }
+          });
+          proc.on("error", reject);
+        });
       }
     } catch (error) {
       const err = error as Error;
@@ -88,6 +108,10 @@ program
     "Set default model for the current provider",
   )
   .option("--show", "Show current configuration (keys are masked)")
+  .option(
+    "--auto-copy <value>",
+    "Enable/disable automatic clipboard copy (true/false)",
+  )
   .action(async (options) => {
     if (options.show) {
       const config = configManager.getConfig();
@@ -145,6 +169,12 @@ program
       console.log(chalk.gray("2. Environment variables"));
       console.log(chalk.gray("3. ~/.llmpeg/config.json"));
       console.log(chalk.gray("4. .env files (lowest)"));
+
+      console.log(chalk.bold("\nSettings:"));
+      console.log(
+        "  Auto-copy:",
+        config.autoCopy ? chalk.green("✓ Enabled") : chalk.gray("✗ Disabled"),
+      );
       return;
     }
 
@@ -188,6 +218,12 @@ program
           `Set default model for ${currentProvider}: ${options.defaultModel}`,
         ),
       );
+      updated = true;
+    }
+    if (options.autoCopy !== undefined) {
+      const value = options.autoCopy.toLowerCase() === "true";
+      configManager.setAutoCopy(value);
+      console.log(chalk.gray(`Auto-copy ${value ? "enabled" : "disabled"}`));
       updated = true;
     }
 

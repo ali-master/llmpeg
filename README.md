@@ -12,10 +12,11 @@ LLmpeg is a powerful command-line tool that uses AI to generate FFmpeg commands 
 
 - 🤖 **Multi-Model Support**: Works with OpenAI (GPT-4), Claude (Anthropic), Google Gemini, and Grok (xAI)
 - 🎯 **Natural Language**: Describe your media processing needs in plain English
-- 📋 **Clipboard Support**: Copy generated commands directly to your clipboard
+- 📋 **Cross-Platform Clipboard**: Copy commands to clipboard on macOS, Windows, and Linux
 - ⚡ **Direct Execution**: Optionally execute generated commands immediately
 - 🔐 **Secure Configuration**: Store API keys safely in your home directory
 - 🎨 **Beautiful CLI**: Colorful output with loading spinners and clear formatting
+- 🔄 **Auto-Copy**: Optionally copy all generated commands to clipboard automatically
 
 ## Installation
 
@@ -106,6 +107,10 @@ llmpeg config --default-provider claude
 
 # Set default model for current provider
 llmpeg config --default-model gpt-4-turbo
+
+# Enable/disable auto-copy
+llmpeg config --auto-copy true
+llmpeg config --auto-copy false
 
 # Multiple settings at once
 llmpeg config --openai KEY --default-provider openai
@@ -202,8 +207,28 @@ The main configuration file is stored at `~/.llmpeg/config.json`:
     "apiKey": "your-claude-key",
     "defaultModel": "claude-3-haiku-20240307"
   },
-  "defaultProvider": "openai"
+  "defaultProvider": "openai",
+  "autoCopy": false
 }
+```
+
+## Clipboard Support
+
+LLmpeg supports clipboard functionality across different platforms:
+
+- **macOS**: Uses native `pbcopy`
+- **Windows**: Uses native `clip`
+- **Linux**: Automatically detects and uses `xclip`, `xsel`, or `wl-copy`
+
+For Linux users, install one of these clipboard utilities:
+```bash
+# Debian/Ubuntu
+sudo apt-get install xclip
+# or
+sudo apt-get install xsel
+
+# Wayland users
+sudo apt-get install wl-clipboard
 ```
 
 ## Tips
@@ -212,6 +237,7 @@ The main configuration file is stored at `~/.llmpeg/config.json`:
 2. **Check commands**: Always review generated commands before execution
 3. **Use appropriate models**: Different models may excel at different types of tasks
 4. **Save commands**: Use `-c` to copy complex commands for later use
+5. **Auto-copy**: Enable auto-copy with `llmpeg config --auto-copy true` to copy all commands automatically
 
 ## Development
 

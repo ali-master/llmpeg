@@ -1,4 +1,4 @@
-import { existsSync } from "fs";
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 import { config as loadDotenv } from "dotenv";
@@ -21,6 +21,7 @@ interface Config {
     defaultModel?: string;
   };
   defaultProvider?: "openai" | "claude" | "gemini" | "grok";
+  autoCopy?: boolean;
 }
 
 class ConfigManager {
@@ -38,8 +39,8 @@ class ConfigManager {
     // 1. Load from config.json if exists
     if (existsSync(this.configFile)) {
       try {
-        const fileContent = Bun.file(this.configFile);
-        this.config = JSON.parse(await fileContent.text());
+        const fileContent = readFileSync(this.configFile, "utf-8");
+        this.config = JSON.parse(fileContent);
       } catch (error) {
         console.warn("Failed to parse config.json:", error);
       }
@@ -60,10 +61,16 @@ class ConfigManager {
 
   private mergeEnvironmentVariables() {
     if (process.env.OPENAI_API_KEY) {
-      this.config.openai = { ...this.config.openai, apiKey: process.env.OPENAI_API_KEY };
+      this.config.openai = {
+        ...this.config.openai,
+        apiKey: process.env.OPENAI_API_KEY,
+      };
     }
     if (process.env.ANTHROPIC_API_KEY) {
-      this.config.claude = { ...this.config.claude, apiKey: process.env.ANTHROPIC_API_KEY };
+      this.config.claude = {
+        ...this.config.claude,
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      };
     }
     if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
       this.config.gemini = {
@@ -72,7 +79,10 @@ class ConfigManager {
       };
     }
     if (process.env.XAI_API_KEY) {
-      this.config.grok = { ...this.config.grok, apiKey: process.env.XAI_API_KEY };
+      this.config.grok = {
+        ...this.config.grok,
+        apiKey: process.env.XAI_API_KEY,
+      };
     }
     if (process.env.LLMPEG_DEFAULT_PROVIDER) {
       this.config.defaultProvider = process.env.LLMPEG_DEFAULT_PROVIDER as any;
@@ -83,12 +93,14 @@ class ConfigManager {
     try {
       // Ensure directory exists
       if (!existsSync(this.configPath)) {
-        await Bun.write(join(this.configPath, ".gitkeep"), "");
+        mkdirSync(this.configPath, { recursive: true });
       }
 
-      await Bun.write(this.configFile, JSON.stringify(this.config, null, 2));
+      writeFileSync(this.configFile, JSON.stringify(this.config, null, 2));
     } catch (error) {
-      throw new Error(`Failed to save configuration: ${(error as Error).message}`);
+      throw new Error(
+        `Failed to save configuration: ${(error as Error).message}`,
+      );
     }
   }
 
@@ -175,6 +187,14 @@ class ConfigManager {
 
   getConfig(): Config {
     return { ...this.config };
+  }
+
+  getAutoCopy(): boolean {
+    return this.config.autoCopy || false;
+  }
+
+  setAutoCopy(value: boolean) {
+    this.config.autoCopy = value;
   }
 }
 
