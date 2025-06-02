@@ -41,6 +41,10 @@
 - ⚡ **Direct Execution**: Run commands immediately
 - 🔐 **Secure Configuration**: API keys stored locally
 - 🎨 **Beautiful CLI**: Colorful and intuitive interface
+- 📚 **Command History**: Track all generated commands with smart search
+- ⭐ **Favorites System**: Save and organize frequently used commands
+- 🏷️ **Smart Tagging**: Auto-categorize commands for easy retrieval
+- 📊 **Usage Analytics**: View statistics about your command usage
 
 ## 📦 Installation
 
@@ -127,6 +131,39 @@ llmpeg config --grok YOUR_KEY
 llmpeg config --default-provider claude
 llmpeg config --default-model gpt-4-turbo
 llmpeg config --auto-copy true
+```
+
+### History Commands
+
+```bash
+# Interactive history browser (default)
+llmpeg history
+
+# List recent commands
+llmpeg history --list
+llmpeg history -l
+
+# Show favorites
+llmpeg history --favorites
+llmpeg history -f
+
+# Search history
+llmpeg history --search "convert to gif"
+llmpeg history -s "video compression"
+
+# Filter by tag
+llmpeg history --tag video
+llmpeg history -t audio
+
+# View statistics
+llmpeg history --stats
+
+# Export history
+llmpeg history --export json
+llmpeg history --export csv
+
+# Clear history (with confirmation)
+llmpeg history --clear
 ```
 
 ## 🎬 Examples
@@ -274,6 +311,34 @@ export LLMPEG_DEFAULT_PROVIDER="claude"
 }
 ```
 
+## 📚 Command History & Favorites
+
+LLmpeg automatically tracks all your generated commands, making it easy to reuse, organize, and learn from your past work.
+
+### Interactive History Browser
+
+The interactive mode provides a user-friendly interface to:
+- Browse recent commands with arrow keys
+- Search through your entire history
+- Mark commands as favorites
+- Add tags and categories
+- Copy or execute commands directly
+- View detailed statistics
+
+### Smart Features
+
+- **Auto-tagging**: Commands are automatically tagged based on content (video, audio, conversion, etc.)
+- **Usage tracking**: See how often you use each command
+- **Favorites**: Star frequently used commands for quick access
+- **Categories**: Organize commands by project or purpose
+- **Export/Import**: Backup your history or share with team members
+
+### History Storage
+
+- History is stored in `~/.llmpeg/history.json`
+- Maximum 1000 commands are kept (favorites are never deleted)
+- Failed attempts are also tracked for learning purposes
+
 ## 📋 Clipboard Support
 
 ### macOS
@@ -328,12 +393,13 @@ We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for 
 
 ## 📈 Roadmap
 
+- [x] Command history and favorites ✅
 - [ ] Interactive mode for command refinement
-- [ ] Command history and favorites
 - [ ] Preset templates for common tasks
 - [ ] Integration with popular video platforms
 - [ ] Web interface
 - [ ] VSCode extension
+- [ ] AI-powered command suggestions based on history
 
 ## 🐛 Troubleshooting
 
