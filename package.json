@@ -1,6 +1,6 @@
 {
   "name": "@usex/llmpeg",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "AI-powered FFmpeg command generator. Describe your video task in plain English, get the perfect FFmpeg command instantly.",
   "type": "module",
   "module": "src/index.ts",
