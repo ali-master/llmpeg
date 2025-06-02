@@ -8,6 +8,9 @@ import { configManager } from "./config.js";
 import { copyToClipboard } from "./clipboard.js";
 import figlet from "figlet";
 import { vice } from "gradient-string";
+import { writeFileSync, mkdirSync, existsSync } from "fs";
+import { join } from "path";
+import { homedir } from "os";
 
 const program = new Command();
 
@@ -88,6 +91,98 @@ program
         console.error(chalk.gray(err.stack));
       }
 
+      process.exit(1);
+    }
+  });
+
+program
+  .command("init")
+  .description("Initialize LLmpeg configuration with a sample config file")
+  .option("-f, --force", "Overwrite existing configuration file")
+  .action(async (options) => {
+    const configPath = join(homedir(), ".llmpeg");
+    const configFile = join(configPath, "config.json");
+
+    // Check if config already exists
+    if (existsSync(configFile) && !options.force) {
+      console.log(chalk.yellow("⚠️  Configuration file already exists!"));
+      console.log(chalk.gray(`   Location: ${configFile}`));
+      console.log(
+        chalk.gray(
+          "\n   Use --force flag to overwrite the existing configuration.",
+        ),
+      );
+      process.exit(1);
+    }
+
+    // Create ~/.llmpeg directory if it doesn't exist
+    if (!existsSync(configPath)) {
+      try {
+        mkdirSync(configPath, { recursive: true });
+        console.log(
+          chalk.green("✓ Created directory:"),
+          chalk.gray(configPath),
+        );
+      } catch (error) {
+        console.error(
+          chalk.red("Failed to create directory:"),
+          (error as Error).message,
+        );
+        process.exit(1);
+      }
+    }
+
+    // Sample configuration with placeholder values
+    const sampleConfig = {
+      openai: {
+        apiKey: "sk-YOUR_OPENAI_API_KEY_HERE",
+        defaultModel: "gpt-4o-mini",
+      },
+      claude: {
+        apiKey: "sk-ant-YOUR_CLAUDE_API_KEY_HERE",
+        defaultModel: "claude-3-haiku-20240307",
+      },
+      gemini: {
+        apiKey: "YOUR_GEMINI_API_KEY_HERE",
+        defaultModel: "gemini-1.5-flash",
+      },
+      grok: {
+        apiKey: "xai-YOUR_GROK_API_KEY_HERE",
+        defaultModel: "grok-beta",
+      },
+      defaultProvider: "openai",
+      autoCopy: true,
+    };
+
+    try {
+      writeFileSync(configFile, JSON.stringify(sampleConfig, null, 2));
+      console.log(
+        chalk.green("✓ Created configuration file:"),
+        chalk.gray(configFile),
+      );
+
+      console.log(chalk.cyan("\n📝 Sample configuration created!"));
+      console.log(chalk.bold("\nNext steps:"));
+      console.log(
+        chalk.gray("1. Edit the configuration file to add your API keys:"),
+      );
+      console.log(chalk.white(`   ${configFile}`));
+      console.log(
+        chalk.gray("\n2. Or use the config command to set API keys:"),
+      );
+      console.log(chalk.white("   llmpeg config --openai YOUR_KEY"));
+      console.log(chalk.white("   llmpeg config --claude YOUR_KEY"));
+      console.log(chalk.white("   llmpeg config --gemini YOUR_KEY"));
+      console.log(chalk.white("   llmpeg config --grok YOUR_KEY"));
+      console.log(chalk.gray("\n3. View your configuration:"));
+      console.log(chalk.white("   llmpeg config --show"));
+      console.log(chalk.gray("\n4. Start using LLmpeg:"));
+      console.log(chalk.white('   llmpeg "convert video.mp4 to gif"'));
+    } catch (error) {
+      console.error(
+        chalk.red("Failed to create configuration file:"),
+        (error as Error).message,
+      );
       process.exit(1);
     }
   });
