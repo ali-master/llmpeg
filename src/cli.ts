@@ -8,6 +8,8 @@ import { configManager } from "./config.js";
 import { copyToClipboard } from "./clipboard.js";
 import { historyManager } from "./history.js";
 import type { HistoryEntry } from "./history.js";
+import { presetManager } from "./presets.js";
+import type { PresetParameter, Preset } from "./presets.js";
 import figlet from "figlet";
 import { vice } from "gradient-string";
 import { writeFileSync, mkdirSync, existsSync } from "fs";
@@ -771,6 +773,699 @@ async function interactiveHistoryBrowser() {
       ]);
     }
   }
+}
+
+program
+  .command("presets")
+  .description("Browse and use preset templates for common tasks")
+  .option("-l, --list", "List all presets")
+  .option("-c, --category <category>", "Filter by category")
+  .option("-s, --search <query>", "Search presets")
+  .option("-u, --use <id>", "Use a specific preset by ID")
+  .option("--export", "Export all presets")
+  .option("--create", "Create a custom preset")
+  .action(async (options) => {
+    if (options.export) {
+      const data = presetManager.exportPresets();
+      const filename = `llmpeg-presets-${new Date().toISOString().split("T")[0]}.json`;
+      writeFileSync(filename, data);
+      console.log(chalk.green(`✓ Presets exported to ${filename}`));
+      return;
+    }
+
+    if (options.create) {
+      await createCustomPreset();
+      return;
+    }
+
+    if (options.use) {
+      await usePreset(options.use);
+      return;
+    }
+
+    if (options.list) {
+      const presets = options.category
+        ? presetManager.getPresetsByCategory(options.category)
+        : presetManager.getAllPresets();
+
+      displayPresetList(presets);
+      return;
+    }
+
+    if (options.search) {
+      const presets = presetManager.searchPresets(options.search);
+      if (presets.length === 0) {
+        console.log(chalk.yellow("\nNo presets found"));
+        return;
+      }
+      displayPresetList(presets);
+      return;
+    }
+
+    // Default to interactive mode
+    await interactivePresetBrowser();
+  });
+
+function displayPresetList(presets: Preset[]) {
+  const categories = [...new Set(presets.map((p) => p.category))];
+
+  console.log(chalk.cyan("\n📋 Available Presets\n"));
+
+  categories.forEach((category) => {
+    console.log(chalk.bold.blue(`\n${category}:`));
+    presets
+      .filter((p) => p.category === category)
+      .forEach((preset) => {
+        const difficulty = {
+          beginner: chalk.green("●"),
+          intermediate: chalk.yellow("●"),
+          advanced: chalk.red("●"),
+        }[preset.difficulty];
+
+        const common = preset.commonUse ? chalk.yellow("★") : " ";
+        console.log(
+          `  ${common} ${difficulty} ${chalk.bold(preset.name)} - ${chalk.gray(preset.description)}`,
+        );
+        console.log(`     ${chalk.gray(`ID: ${preset.id}`)}`);
+      });
+  });
+
+  console.log(
+    chalk.gray(
+      "\n★ = Common use | ● = Difficulty (green=easy, yellow=medium, red=hard)",
+    ),
+  );
+}
+
+async function usePreset(presetId: string) {
+  const preset = presetManager.getPresetById(presetId);
+  if (!preset) {
+    console.error(chalk.red(`Preset "${presetId}" not found`));
+    return;
+  }
+
+  console.log(chalk.cyan(`\nUsing preset: ${preset.name}`));
+  console.log(chalk.gray(preset.description));
+
+  const parameters: Record<string, any> = {};
+
+  // Collect parameter values
+  if (preset.parameters && preset.parameters.length > 0) {
+    console.log(chalk.bold("\nPlease provide the following parameters:"));
+
+    for (const param of preset.parameters) {
+      const answer = await promptForParameter(param);
+      parameters[param.name] = answer;
+    }
+  }
+
+  // Build the final prompt
+  const finalPrompt = presetManager.buildPromptFromPreset(presetId, parameters);
+
+  console.log(chalk.cyan("\nGenerated prompt:"), finalPrompt);
+
+  const { action } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "action",
+      message: "What would you like to do?",
+      choices: [
+        { name: "Execute this command", value: "execute" },
+        { name: "Copy prompt and exit", value: "copy" },
+        { name: "Cancel", value: "cancel" },
+      ],
+    },
+  ]);
+
+  if (action === "cancel") {
+    return;
+  }
+
+  if (action === "copy") {
+    try {
+      await copyToClipboard(finalPrompt);
+      console.log(chalk.green("\n✓ Prompt copied to clipboard"));
+      console.log(chalk.gray(`Run: llmpeg "${finalPrompt}"`));
+    } catch {
+      console.log(chalk.red("\n✗ Failed to copy to clipboard"));
+      console.log(chalk.gray(`Prompt: ${finalPrompt}`));
+    }
+    return;
+  }
+
+  // Execute the command
+  const model = configManager.getDefaultProvider();
+  const provider = configManager.getDefaultModel(model);
+
+  const spinner = ora("Generating FFmpeg command...").start();
+
+  try {
+    const command = await generateFfmpegCommand(finalPrompt, {
+      model,
+      provider,
+    });
+
+    spinner.succeed("Command generated successfully!");
+
+    console.log(`\n${chalk.cyan("Prompt:")} ${finalPrompt}`);
+    console.log(`${chalk.green("Command:")} ${chalk.bold(command)}`);
+
+    // Add to history with preset tag
+    historyManager.add({
+      prompt: finalPrompt,
+      command,
+      provider: model,
+      model: provider,
+      category: preset.category,
+    });
+
+    // Increment usage count for custom presets
+    if ((preset as any).isCustom) {
+      presetManager.incrementUsageCount(preset.id);
+    }
+
+    // Check if we should copy to clipboard
+    const shouldCopy = configManager.getAutoCopy();
+
+    if (shouldCopy) {
+      try {
+        await copyToClipboard(command);
+        console.log(chalk.yellow("\n✓ Command copied to clipboard"));
+      } catch (error) {
+        console.log(
+          chalk.red("\n✗ Failed to copy to clipboard:"),
+          (error as Error).message,
+        );
+      }
+    }
+  } catch (error) {
+    spinner.fail("Failed to generate command");
+    console.error(chalk.red("Error:"), (error as Error).message);
+  }
+}
+
+async function promptForParameter(param: PresetParameter): Promise<any> {
+  const message = `${param.description}${param.required ? " (required)" : ""}:`;
+
+  switch (param.type) {
+    case "select":
+      return (
+        await inquirer.prompt([
+          {
+            type: "list",
+            name: "value",
+            message,
+            choices: param.options || [],
+            default: param.default,
+          },
+        ])
+      ).value;
+
+    case "number": {
+      const numAnswer = await inquirer.prompt({
+        type: "number",
+        name: "value",
+        message,
+        default: param.default,
+        validate: (input: number | undefined) => {
+          if (input === undefined) return true; // Let default handle it
+          if (param.validation) {
+            if (
+              param.validation.min !== undefined &&
+              input < param.validation.min
+            ) {
+              return `Value must be at least ${param.validation.min}`;
+            }
+            if (
+              param.validation.max !== undefined &&
+              input > param.validation.max
+            ) {
+              return `Value must be at most ${param.validation.max}`;
+            }
+          }
+          return true;
+        },
+      });
+      return numAnswer.value;
+    }
+
+    case "boolean":
+      return (
+        await inquirer.prompt([
+          {
+            type: "confirm",
+            name: "value",
+            message,
+            default: param.default || false,
+          },
+        ])
+      ).value;
+
+    case "file":
+    case "string":
+    default:
+      return (
+        await inquirer.prompt([
+          {
+            type: "input",
+            name: "value",
+            message,
+            default: param.default,
+            validate: (input) => {
+              if (param.required && !input) {
+                return "This field is required";
+              }
+              if (param.validation && param.validation.pattern) {
+                const regex = new RegExp(param.validation.pattern);
+                if (!regex.test(input)) {
+                  return `Invalid format (expected: ${param.validation.pattern})`;
+                }
+              }
+              return true;
+            },
+          },
+        ])
+      ).value;
+  }
+}
+
+async function interactivePresetBrowser() {
+  while (true) {
+    const { action } = await inquirer.prompt([
+      {
+        type: "list",
+        name: "action",
+        message: "What would you like to do?",
+        choices: [
+          { name: "Browse by category", value: "category" },
+          { name: "View common presets", value: "common" },
+          { name: "Search presets", value: "search" },
+          { name: "View all presets", value: "all" },
+          { name: "Create custom preset", value: "create" },
+          { name: "Manage custom presets", value: "manage" },
+          { name: "Exit", value: "exit" },
+        ],
+      },
+    ]);
+
+    if (action === "exit") {
+      break;
+    }
+
+    if (action === "create") {
+      await createCustomPreset();
+      continue;
+    }
+
+    if (action === "manage") {
+      await manageCustomPresets();
+      continue;
+    }
+
+    let presets: Preset[] = [];
+
+    if (action === "category") {
+      const categories = presetManager.getCategories();
+      const { category } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "category",
+          message: "Select a category:",
+          choices: categories,
+        },
+      ]);
+      presets = presetManager.getPresetsByCategory(category);
+    } else if (action === "common") {
+      presets = presetManager.getCommonPresets();
+    } else if (action === "all") {
+      presets = presetManager.getAllPresets();
+    } else if (action === "search") {
+      const { query } = await inquirer.prompt([
+        {
+          type: "input",
+          name: "query",
+          message: "Enter search query:",
+        },
+      ]);
+      presets = presetManager.searchPresets(query);
+
+      if (presets.length === 0) {
+        console.log(chalk.yellow("\nNo presets found"));
+        await inquirer.prompt([
+          {
+            type: "input",
+            name: "continue",
+            message: "Press Enter to continue...",
+          },
+        ]);
+        continue;
+      }
+    }
+
+    // Display presets and allow selection
+    const choices = presets.map((preset) => {
+      const difficulty = {
+        beginner: chalk.green("●"),
+        intermediate: chalk.yellow("●"),
+        advanced: chalk.red("●"),
+      }[preset.difficulty];
+
+      const common = preset.commonUse ? chalk.yellow("★") : " ";
+      const custom = (preset as any).isCustom ? chalk.cyan("[CUSTOM]") : "";
+
+      return {
+        name: `${common} ${difficulty} ${preset.name} ${custom}`,
+        value: preset.id,
+        short: preset.description,
+      };
+    });
+
+    choices.push({ name: chalk.gray("← Back"), value: "back", short: "Back" });
+
+    const { selectedId } = await inquirer.prompt([
+      {
+        type: "list",
+        name: "selectedId",
+        message: "Select a preset:",
+        choices,
+        pageSize: 15,
+      },
+    ]);
+
+    if (selectedId === "back") {
+      continue;
+    }
+
+    // Show preset details
+    const preset = presets.find((p) => p.id === selectedId)!;
+    console.log(chalk.cyan("\nPreset Details:\n"));
+    console.log(`${chalk.bold("Name:")} ${preset.name}`);
+    console.log(`${chalk.bold("Description:")} ${preset.description}`);
+    console.log(`${chalk.bold("Category:")} ${preset.category}`);
+    console.log(`${chalk.bold("Difficulty:")} ${preset.difficulty}`);
+    console.log(`${chalk.bold("Tags:")} ${preset.tags.join(", ")}`);
+    console.log(`${chalk.bold("Template:")} ${chalk.gray(preset.prompt)}`);
+
+    if (preset.parameters && preset.parameters.length > 0) {
+      console.log(chalk.bold("\nParameters:"));
+      preset.parameters.forEach((param) => {
+        console.log(`  - ${param.name} (${param.type}): ${param.description}`);
+      });
+    }
+
+    if (preset.examples && preset.examples.length > 0) {
+      console.log(chalk.bold("\nExamples:"));
+      preset.examples.forEach((example) => {
+        console.log(`  ${chalk.gray(example)}`);
+      });
+    }
+
+    const { presetAction } = await inquirer.prompt([
+      {
+        type: "list",
+        name: "presetAction",
+        message: "What would you like to do?",
+        choices: [
+          { name: "Use this preset", value: "use" },
+          { name: "Copy template", value: "copy" },
+          ...((preset as any).isCustom
+            ? [
+                { name: "Edit preset", value: "edit" },
+                { name: "Delete preset", value: "delete" },
+              ]
+            : []),
+          { name: "Back", value: "back" },
+        ],
+      },
+    ]);
+
+    if (presetAction === "use") {
+      await usePreset(preset.id);
+      break;
+    } else if (presetAction === "copy") {
+      try {
+        await copyToClipboard(preset.prompt);
+        console.log(chalk.green("\n✓ Template copied to clipboard"));
+      } catch {
+        console.log(chalk.red("\n✗ Failed to copy to clipboard"));
+      }
+      await inquirer.prompt([
+        {
+          type: "input",
+          name: "continue",
+          message: "Press Enter to continue...",
+        },
+      ]);
+    } else if (presetAction === "edit" && (preset as any).isCustom) {
+      // Edit custom preset functionality would go here
+      console.log(chalk.yellow("Edit functionality coming soon..."));
+      await inquirer.prompt([
+        {
+          type: "input",
+          name: "continue",
+          message: "Press Enter to continue...",
+        },
+      ]);
+    } else if (presetAction === "delete" && (preset as any).isCustom) {
+      const { confirmDelete } = await inquirer.prompt([
+        {
+          type: "confirm",
+          name: "confirmDelete",
+          message: "Are you sure you want to delete this custom preset?",
+          default: false,
+        },
+      ]);
+
+      if (confirmDelete) {
+        presetManager.deleteCustomPreset(preset.id);
+        console.log(chalk.green("\n✓ Custom preset deleted"));
+        await inquirer.prompt([
+          {
+            type: "input",
+            name: "continue",
+            message: "Press Enter to continue...",
+          },
+        ]);
+        break;
+      }
+    }
+  }
+}
+
+async function createCustomPreset() {
+  console.log(chalk.cyan("\n🎨 Create Custom Preset\n"));
+
+  const questions = [
+    {
+      type: "input",
+      name: "name",
+      message: "Preset name:",
+      validate: (input: string) => input.length > 0 || "Name is required",
+    },
+    {
+      type: "input",
+      name: "description",
+      message: "Description:",
+      validate: (input: string) =>
+        input.length > 0 || "Description is required",
+    },
+    {
+      type: "list",
+      name: "category",
+      message: "Category:",
+      choices: [
+        ...presetManager.getCategories(),
+        { name: "Create new category...", value: "new" },
+      ],
+    },
+    {
+      type: "input",
+      name: "newCategory",
+      message: "New category name:",
+      when: (answers: any) => answers.category === "new",
+      validate: (input: string) =>
+        input.length > 0 || "Category name is required",
+    },
+    {
+      type: "input",
+      name: "prompt",
+      message: "Template prompt (use {param} for parameters):",
+      validate: (input: string) => input.length > 0 || "Prompt is required",
+    },
+    {
+      type: "input",
+      name: "tags",
+      message: "Tags (comma-separated):",
+      default: "",
+    },
+    {
+      type: "list",
+      name: "difficulty",
+      message: "Difficulty:",
+      choices: ["beginner", "intermediate", "advanced"],
+      default: "intermediate",
+    },
+    {
+      type: "confirm",
+      name: "commonUse",
+      message: "Mark as common use?",
+      default: false,
+    },
+    {
+      type: "confirm",
+      name: "addParameters",
+      message: "Add parameters to this preset?",
+      default: true,
+    },
+  ];
+
+  const answers = await inquirer.prompt(questions as any);
+
+  const category =
+    answers.category === "new" ? answers.newCategory || "" : answers.category;
+  const tags = answers.tags
+    .split(",")
+    .map((t: string) => t.trim())
+    .filter((t: string) => t);
+  const parameters: PresetParameter[] = [];
+
+  // Extract parameters from prompt
+  const paramMatches = answers.prompt.match(/\{(\w+)\}/g);
+  const paramNames = paramMatches
+    ? paramMatches.map((m: string) => m.slice(1, -1))
+    : [];
+
+  if (answers.addParameters && paramNames.length > 0) {
+    console.log(chalk.cyan("\nDefine parameters found in your template:"));
+
+    for (const paramName of paramNames) {
+      console.log(chalk.bold(`\nParameter: {${paramName}}`));
+
+      const paramAnswers = await inquirer.prompt([
+        {
+          type: "input",
+          name: "description",
+          message: "Description:",
+          default: paramName,
+        },
+        {
+          type: "list",
+          name: "type",
+          message: "Type:",
+          choices: ["string", "number", "boolean", "select", "file"],
+          default: "string",
+        },
+        {
+          type: "confirm",
+          name: "required",
+          message: "Required?",
+          default: true,
+        },
+        {
+          type: "input",
+          name: "default",
+          message: "Default value (leave empty for none):",
+        },
+        {
+          type: "input",
+          name: "options",
+          message: "Options (comma-separated):",
+          when: (answers: any) => answers.type === "select",
+        },
+      ]);
+
+      const parameter: PresetParameter = {
+        name: paramName,
+        description: paramAnswers.description,
+        type: paramAnswers.type,
+        required: paramAnswers.required,
+      };
+
+      if (paramAnswers.default) {
+        parameter.default =
+          paramAnswers.type === "number"
+            ? Number.parseFloat(paramAnswers.default)
+            : paramAnswers.default;
+      }
+
+      if (paramAnswers.options) {
+        parameter.options = paramAnswers.options
+          .split(",")
+          .map((o: string) => o.trim());
+      }
+
+      parameters.push(parameter);
+    }
+  }
+
+  // Create the preset
+  presetManager.addCustomPreset({
+    name: answers.name,
+    description: answers.description,
+    category,
+    prompt: answers.prompt,
+    parameters,
+    tags,
+    difficulty: answers.difficulty,
+    commonUse: answers.commonUse,
+    examples: [],
+  });
+
+  console.log(chalk.green("\n✓ Custom preset created successfully!"));
+
+  const { testNow } = await inquirer.prompt([
+    {
+      type: "confirm",
+      name: "testNow",
+      message: "Would you like to test this preset now?",
+      default: true,
+    },
+  ]);
+
+  if (testNow) {
+    const presets = presetManager.getAllPresets();
+    const newPreset = presets[presets.length - 1]; // Last added
+    await usePreset(newPreset.id);
+  }
+}
+
+async function manageCustomPresets() {
+  const customPresets = presetManager
+    .getAllPresets()
+    .filter((p: any) => p.isCustom);
+
+  if (customPresets.length === 0) {
+    console.log(chalk.yellow("\nNo custom presets found"));
+    await inquirer.prompt([
+      {
+        type: "input",
+        name: "continue",
+        message: "Press Enter to continue...",
+      },
+    ]);
+    return;
+  }
+
+  console.log(chalk.cyan("\n📝 Custom Presets\n"));
+
+  customPresets.forEach((preset: any) => {
+    console.log(`${chalk.bold(preset.name)} - ${preset.description}`);
+    console.log(
+      `  Category: ${preset.category} | Used: ${preset.usageCount} times`,
+    );
+    console.log(
+      `  Created: ${new Date(preset.createdAt).toLocaleDateString()}`,
+    );
+    console.log();
+  });
+
+  await inquirer.prompt([
+    {
+      type: "input",
+      name: "continue",
+      message: "Press Enter to continue...",
+    },
+  ]);
 }
 
 console.log(`

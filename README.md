@@ -45,6 +45,9 @@
 - ⭐ **Favorites System**: Save and organize frequently used commands
 - 🏷️ **Smart Tagging**: Auto-categorize commands for easy retrieval
 - 📊 **Usage Analytics**: View statistics about your command usage
+- 🎯 **Preset Templates**: 30+ built-in presets for common FFmpeg tasks
+- 🛠️ **Custom Presets**: Create your own parameterized templates
+- 📁 **Category Browser**: Organized presets by task type
 
 ## 📦 Installation
 
@@ -164,6 +167,35 @@ llmpeg history --export csv
 
 # Clear history (with confirmation)
 llmpeg history --clear
+```
+
+### Preset Commands
+
+```bash
+# Interactive preset browser (default)
+llmpeg presets
+
+# List all presets
+llmpeg presets --list
+llmpeg presets -l
+
+# Filter by category
+llmpeg presets --category "Video Conversion"
+llmpeg presets -c "Audio Processing"
+
+# Search presets
+llmpeg presets --search "compress"
+llmpeg presets -s "gif"
+
+# Use a specific preset
+llmpeg presets --use convert-to-mp4
+llmpeg presets -u video-to-gif
+
+# Create custom preset
+llmpeg presets --create
+
+# Export all presets
+llmpeg presets --export
 ```
 
 ## 🎬 Examples
@@ -311,6 +343,48 @@ export LLMPEG_DEFAULT_PROVIDER="claude"
 }
 ```
 
+## 🎯 Preset Templates
+
+LLmpeg includes 30+ professionally crafted presets for common FFmpeg tasks, organized by category. Each preset is a parameterized template that guides you through the process.
+
+### Built-in Preset Categories
+
+- **Video Conversion**: MP4, WebM, AVI, MOV conversions with optimal settings
+- **Video Compression**: Optimize for web, Discord, social media platforms
+- **GIF Creation**: Create high-quality GIFs with palette optimization
+- **Audio Processing**: Extract, convert, normalize audio tracks
+- **Video Editing**: Trim, merge, watermark, resize videos
+- **Effects & Filters**: Blur, stabilize, color correction
+- **Social Media**: Instagram, TikTok, YouTube optimized formats
+- **Streaming**: RTMP streaming setup for various platforms
+- **Advanced**: Frame extraction, thumbnail generation, batch processing
+
+### Preset Features
+
+- **Smart Parameters**: Each preset includes customizable parameters with validation
+- **Difficulty Levels**: Marked as beginner, intermediate, or advanced
+- **Common Use Marking**: Quickly find the most popular presets
+- **Examples**: See how each preset works with real examples
+- **Custom Presets**: Create and save your own templates
+
+### Using Presets
+
+1. **Browse**: Use `llmpeg presets` to explore available templates
+2. **Select**: Choose a preset that matches your task
+3. **Customize**: Fill in the required parameters (files, quality, etc.)
+4. **Execute**: Generate and run the FFmpeg command
+
+Example workflow:
+```bash
+$ llmpeg presets
+> Browse by category
+> Video Conversion
+> Convert to MP4
+> Input file: movie.avi
+> Quality: 23 (Medium)
+✓ Generated command: ffmpeg -i movie.avi -c:v libx264 -crf 23 -c:a aac output.mp4
+```
+
 ## 📚 Command History & Favorites
 
 LLmpeg automatically tracks all your generated commands, making it easy to reuse, organize, and learn from your past work.
@@ -394,12 +468,14 @@ We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for 
 ## 📈 Roadmap
 
 - [x] Command history and favorites ✅
+- [x] Preset templates for common tasks ✅
 - [ ] Interactive mode for command refinement
-- [ ] Preset templates for common tasks
 - [ ] Integration with popular video platforms
 - [ ] Web interface
 - [ ] VSCode extension
+- [ ] Team collaboration features
 - [ ] AI-powered command suggestions based on history
+- [ ] Plugin system for custom extensions
 
 ## 🐛 Troubleshooting
 
