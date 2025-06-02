@@ -4,37 +4,67 @@
   "description": "AI-powered FFmpeg command generator. Describe your video task in plain English, get the perfect FFmpeg command instantly.",
   "type": "module",
   "module": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "bin": {
-    "llmpeg": "./src/cli.ts"
+    "llmpeg": "./dist/cli.js"
   },
   "sideEffects": false,
-  "keywords": ["ffmpeg", "ai", "cli", "video", "audio", "converter", "openai", "claude", "gemini", "grok", "media"],
-  "author": "LLmpeg Contributors",
+  "keywords": [
+    "ffmpeg",
+    "ai",
+    "cli",
+    "video",
+    "audio",
+    "converter",
+    "openai",
+    "claude",
+    "gemini",
+    "grok",
+    "media"
+  ],
+  "author": {
+    "name": "Ali Torki",
+    "url": "https://github.com/ali-master",
+    "email": "ali_4286@live.com"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/llmpeg.git"
+    "url": "https://github.com/ali-master/llmpeg.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/llmpeg/issues"
+    "url": "https://github.com/ali-master/llmpeg/issues"
   },
-  "homepage": "https://github.com/yourusername/llmpeg#readme",
-  "logo": "https://raw.githubusercontent.com/yourusername/llmpeg/main/assets/logo.svg",
+  "homepage": "https://github.com/ali-master/llmpeg#readme",
+  "logo": "https://raw.githubusercontent.com/ali-master/llmpeg/master/assets/logo.svg",
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target node --format esm --minify --sourcemap --splitting",
-    "start:dev": "bun --bun --env-file=.env.development run src/index.ts",
-    "start:prod": "bun --bun --env-file=.env.production.local run src/index.ts",
+    "prebuild": "bunx rimraf dist",
+    "build": "bun run build:main && bun run build:cli && bun run build:dts",
+    "build:dts": "tsc --emitDeclarationOnly --declaration --noEmit false --outDir dist --project ./tsconfig.json",
+    "build:main": "bun build src/index.ts --outdir dist --target node --format esm --minify --sourcemap",
+    "build:cli": "bun build src/cli.ts --outdir dist --target node --format esm --minify --sourcemap",
+    "start:dev": "bun --bun run src/index.ts",
+    "start:cli:dev": "bun --bun run src/cli.ts",
     "test:types": "tsc --noEmit",
     "format": "prettier --write \"**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "preinstall": "bunx only-allow bun"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^4.13.2",
     "@types/bun": "latest",
-    "prettier": "^3.5.3",
-    "@types/figlet": "^1.7.0"
+    "@types/figlet": "^1.7.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-format": "^1.0.1",
+    "prettier": "^3.5.3"
   },
   "peerDependencies": {
     "typescript": "^5.7.3"

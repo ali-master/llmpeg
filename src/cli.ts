@@ -14,7 +14,10 @@ program
   .name("llmpeg")
   .description("Generate FFmpeg commands using AI models")
   .version("1.0.0")
-  .option("-m, --model <model>", "AI model to use (openai, claude, gemini, grok)")
+  .option(
+    "-m, --model <model>",
+    "AI model to use (openai, claude, gemini, grok)",
+  )
   .option("-p, --provider <provider>", "Model provider specific variant")
   .option("-c, --copy", "Copy command to clipboard")
   .option("-e, --execute", "Execute the generated command")
@@ -37,8 +40,8 @@ program
 
       spinner.succeed("Command generated successfully!");
 
-      console.log("\n" + chalk.cyan("Prompt:") + " " + prompt);
-      console.log(chalk.green("Command:") + " " + chalk.bold(command));
+      console.log(`\n${chalk.cyan("Prompt:")} ${prompt}`);
+      console.log(`${chalk.green("Command:")} ${chalk.bold(command)}`);
 
       if (options.copy) {
         const proc = Bun.spawn(["pbcopy"], {
@@ -76,8 +79,14 @@ program
   .option("--claude <key>", "Set Claude API key")
   .option("--gemini <key>", "Set Google Gemini API key")
   .option("--grok <key>", "Set Grok API key")
-  .option("--default-provider <provider>", "Set default AI provider (openai, claude, gemini, grok)")
-  .option("--default-model <model>", "Set default model for the current provider")
+  .option(
+    "--default-provider <provider>",
+    "Set default AI provider (openai, claude, gemini, grok)",
+  )
+  .option(
+    "--default-model <model>",
+    "Set default model for the current provider",
+  )
   .option("--show", "Show current configuration (keys are masked)")
   .action(async (options) => {
     if (options.show) {
@@ -98,19 +107,34 @@ program
         "  Gemini:",
         config.gemini?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set"),
       );
-      console.log("  Grok:", config.grok?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set"));
+      console.log(
+        "  Grok:",
+        config.grok?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set"),
+      );
 
       console.log(chalk.bold("\nDefaults:"));
-      console.log("  Default Provider:", chalk.yellow(config.defaultProvider || "openai"));
+      console.log(
+        "  Default Provider:",
+        chalk.yellow(config.defaultProvider || "openai"),
+      );
 
       if (config.openai?.defaultModel) {
-        console.log("  OpenAI Model:", chalk.yellow(config.openai.defaultModel));
+        console.log(
+          "  OpenAI Model:",
+          chalk.yellow(config.openai.defaultModel),
+        );
       }
       if (config.claude?.defaultModel) {
-        console.log("  Claude Model:", chalk.yellow(config.claude.defaultModel));
+        console.log(
+          "  Claude Model:",
+          chalk.yellow(config.claude.defaultModel),
+        );
       }
       if (config.gemini?.defaultModel) {
-        console.log("  Gemini Model:", chalk.yellow(config.gemini.defaultModel));
+        console.log(
+          "  Gemini Model:",
+          chalk.yellow(config.gemini.defaultModel),
+        );
       }
       if (config.grok?.defaultModel) {
         console.log("  Grok Model:", chalk.yellow(config.grok.defaultModel));
@@ -145,8 +169,12 @@ program
     if (options.defaultProvider) {
       const validProviders = ["openai", "claude", "gemini", "grok"];
       if (!validProviders.includes(options.defaultProvider.toLowerCase())) {
-        console.error(chalk.red(`Invalid provider: ${options.defaultProvider}`));
-        console.error(chalk.gray(`Valid providers: ${validProviders.join(", ")}`));
+        console.error(
+          chalk.red(`Invalid provider: ${options.defaultProvider}`),
+        );
+        console.error(
+          chalk.gray(`Valid providers: ${validProviders.join(", ")}`),
+        );
         process.exit(1);
       }
       configManager.setDefaultProvider(options.defaultProvider.toLowerCase());
@@ -155,13 +183,19 @@ program
     if (options.defaultModel) {
       const currentProvider = configManager.getDefaultProvider();
       configManager.setDefaultModel(currentProvider, options.defaultModel);
-      console.log(chalk.gray(`Set default model for ${currentProvider}: ${options.defaultModel}`));
+      console.log(
+        chalk.gray(
+          `Set default model for ${currentProvider}: ${options.defaultModel}`,
+        ),
+      );
       updated = true;
     }
 
     if (updated) {
       await configManager.save();
-      console.log(chalk.green("✓ Configuration saved to ~/.llmpeg/config.json"));
+      console.log(
+        chalk.green("✓ Configuration saved to ~/.llmpeg/config.json"),
+      );
     } else {
       console.log(chalk.yellow("No configuration changes made."));
       console.log(chalk.gray("Use --help to see available options."));

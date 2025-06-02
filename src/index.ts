@@ -12,8 +12,12 @@ interface GenerateOptions {
   provider?: string;
 }
 
-export async function generateFfmpegCommand(prompt: string, options: GenerateOptions = {}) {
-  const { model: modelType = configManager.getDefaultProvider(), provider } = options;
+export async function generateFfmpegCommand(
+  prompt: string,
+  options: GenerateOptions = {},
+) {
+  const { model: modelType = configManager.getDefaultProvider(), provider } =
+    options;
 
   let model;
   const apiKey = configManager.getApiKey(modelType);
@@ -71,14 +75,17 @@ export async function generateFfmpegCommand(prompt: string, options: GenerateOpt
 
 // Example usage (only runs when called directly)
 if (import.meta.main) {
-  const prompt = "convert exampleVid.mov to h264, remove audio, and put it in an mp4 container";
-  try {
-    const command = await generateFfmpegCommand(prompt);
-    console.log(`Prompt: ${prompt}`);
-    console.log(`Command: ${command}`);
-  } catch (error) {
-    console.error("Error:", (error as Error).message);
-    console.log("\nPlease configure an API key using:");
-    console.log("  llmpeg config --openai YOUR_API_KEY");
-  }
+  (async () => {
+    const prompt =
+      "convert exampleVid.mov to h264, remove audio, and put it in an mp4 container";
+    try {
+      const command = await generateFfmpegCommand(prompt);
+      console.log(`Prompt: ${prompt}`);
+      console.log(`Command: ${command}`);
+    } catch (error) {
+      console.error("Error:", (error as Error).message);
+      console.log("\nPlease configure an API key using:");
+      console.log("  llmpeg config --openai YOUR_API_KEY");
+    }
+  })();
 }
