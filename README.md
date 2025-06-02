@@ -1,201 +1,255 @@
 <div align="center">
-  <img src="assets/logo.svg" alt="LLmpeg Logo" width="200" height="200">
+  <br>
+  <img src="assets/logo.svg" alt="LLmpeg Logo" width="240" height="240">
+  <br>
+  <br>
   
-  # LLmpeg 🎥✨
-
-  > Generate FFmpeg commands using AI models (OpenAI, Claude, Gemini, Grok)
+  <h1>LLmpeg</h1>
+  
+  <p>
+    <strong>🎥 Transform natural language into FFmpeg commands using AI</strong>
+  </p>
+  
+  <p>
+    <a href="#-features">Features</a> •
+    <a href="#-installation">Installation</a> •
+    <a href="#-quick-start">Quick Start</a> •
+    <a href="#-examples">Examples</a> •
+    <a href="#-supported-ai-models">Models</a> •
+    <a href="#-contributing">Contributing</a>
+  </p>
+  
+  <p>
+    <a href="https://www.npmjs.com/package/@usex/llmpeg">
+      <img src="https://img.shields.io/npm/v/@usex/llmpeg?style=flat-square&color=00DC82&label=npm" alt="npm version">
+    </a>
+    <a href="https://github.com/ali-master/llmpeg/blob/master/LICENSE">
+      <img src="https://img.shields.io/github/license/ali-master/llmpeg?style=flat-square&color=00DC82" alt="license">
+    </a>
+    <a href="https://github.com/ali-master/llmpeg">
+      <img src="https://img.shields.io/github/stars/ali-master/llmpeg?style=flat-square&color=00DC82" alt="github stars">
+    </a>
+  </p>
 </div>
 
-LLmpeg is a powerful command-line tool that uses AI to generate FFmpeg commands from natural language descriptions. Simply describe what you want to do with your video/audio files, and LLmpeg will generate the appropriate FFmpeg command for you.
+<br>
 
-## Features
+## ✨ Features
+- 🤖 **Multi-Model Support**: OpenAI, Claude, Gemini, and Grok
+- 🎯 **Natural Language**: Describe tasks in plain English
+- 📋 **Cross-Platform Clipboard**: Works on macOS, Windows, Linux
+- ⚡ **Direct Execution**: Run commands immediately
+- 🔐 **Secure Configuration**: API keys stored locally
+- 🎨 **Beautiful CLI**: Colorful and intuitive interface
 
-- 🤖 **Multi-Model Support**: Works with OpenAI (GPT-4), Claude (Anthropic), Google Gemini, and Grok (xAI)
-- 🎯 **Natural Language**: Describe your media processing needs in plain English
-- 📋 **Cross-Platform Clipboard**: Copy commands to clipboard on macOS, Windows, and Linux
-- ⚡ **Direct Execution**: Optionally execute generated commands immediately
-- 🔐 **Secure Configuration**: Store API keys safely in your home directory
-- 🎨 **Beautiful CLI**: Colorful output with loading spinners and clear formatting
-- 🔄 **Auto-Copy**: Optionally copy all generated commands to clipboard automatically
-
-## Installation
+## 📦 Installation
 
 ```bash
-# Using npm
+# npm
 npm install -g @usex/llmpeg
 
-# Using bun
+# bun (recommended)
 bun install -g @usex/llmpeg
 
-# Using yarn
+# yarn
 yarn global add @usex/llmpeg
+
+# pnpm
+pnpm add -g @usex/llmpeg
 ```
 
-## Quick Start
+### System Requirements
 
-1. **Configure your API key** (at least one):
+- **Node.js** 18.0.0 or higher
+- **FFmpeg** installed on your system ([Download FFmpeg](https://ffmpeg.org/download.html))
+- **API Key** from at least one AI provider
+
+## 🚀 Quick Start
+
+### 1️⃣ Initialize Configuration
+
 ```bash
-# Configure OpenAI
-llmpeg config --openai YOUR_OPENAI_API_KEY
-
-# Configure Claude
-llmpeg config --claude YOUR_ANTHROPIC_API_KEY
-
-# Configure Gemini
-llmpeg config --gemini YOUR_GOOGLE_API_KEY
-
-# Configure Grok
-llmpeg config --grok YOUR_XAI_API_KEY
+llmpeg init
 ```
 
-2. **Generate an FFmpeg command**:
-```bash
-llmpeg "convert video.mp4 to webm format with VP9 codec"
-```
+This creates a configuration file at `~/.llmpeg/config.json` with placeholders for your API keys.
 
-## Usage
-
-### Basic Command Generation
+### 2️⃣ Add Your API Key
 
 ```bash
-# Simple conversion
-llmpeg "convert input.mov to mp4"
-
-# More complex example
-llmpeg "extract audio from video.mp4 and save as mp3 with 192k bitrate"
-
-# Multiple operations
-llmpeg "resize video to 720p, add fade in and fade out effects, and compress for web"
-```
-
-### Command Options
-
-```bash
-# Use a specific AI model
-llmpeg -m claude "stabilize shaky video footage"
-llmpeg -m gemini "create a gif from video between 10-15 seconds"
-llmpeg -m grok "merge audio.mp3 with video.mp4"
-
-# Use a specific model variant
-llmpeg -m openai -p gpt-4 "complex video editing task"
-llmpeg -m claude -p claude-3-opus-20240229 "advanced filtering"
-
-# Copy command to clipboard
-llmpeg -c "compress video for Discord upload"
-
-# Execute the command directly
-llmpeg -e "convert all png images to a video"
-
-# Verbose output for debugging
-llmpeg -v "extract frames from video"
-```
-
-### Configuration Management
-
-```bash
-# Show current configuration
-llmpeg config --show
-
-# Set API keys
+# Choose your preferred AI provider
 llmpeg config --openai YOUR_OPENAI_KEY
 llmpeg config --claude YOUR_ANTHROPIC_KEY
 llmpeg config --gemini YOUR_GOOGLE_KEY
 llmpeg config --grok YOUR_XAI_KEY
-
-# Set default provider (openai, claude, gemini, grok)
-llmpeg config --default-provider claude
-
-# Set default model for current provider
-llmpeg config --default-model gpt-4-turbo
-
-# Enable/disable auto-copy
-llmpeg config --auto-copy true
-llmpeg config --auto-copy false
-
-# Multiple settings at once
-llmpeg config --openai KEY --default-provider openai
 ```
 
-## Supported AI Models
+### 3️⃣ Generate Your First Command
 
-### OpenAI (Default)
-- `gpt-4o-mini` (default)
-- `gpt-4`
-- `gpt-4-turbo`
-- `gpt-3.5-turbo`
+```bash
+llmpeg "convert video.mp4 to gif with 10fps"
+```
+
+## 📖 Usage
+
+### Basic Syntax
+
+```bash
+llmpeg [options] "<your request in natural language>"
+```
+
+### Command Options
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--model <provider>` | `-m` | AI provider to use (`openai`, `claude`, `gemini`, `grok`) |
+| `--provider <model>` | `-p` | Specific model variant (e.g., `gpt-4`, `claude-3-opus`) |
+| `--copy` | `-c` | Copy command to clipboard |
+| `--execute` | `-e` | Execute the generated command immediately |
+| `--verbose` | `-v` | Show detailed output |
+
+### Configuration Commands
+
+```bash
+# Initialize configuration
+llmpeg init [--force]
+
+# Show current configuration
+llmpeg config --show
+
+# Set API keys
+llmpeg config --openai YOUR_KEY
+llmpeg config --claude YOUR_KEY
+llmpeg config --gemini YOUR_KEY
+llmpeg config --grok YOUR_KEY
+
+# Set preferences
+llmpeg config --default-provider claude
+llmpeg config --default-model gpt-4-turbo
+llmpeg config --auto-copy true
+```
+
+## 🎬 Examples
+
+### Video Operations
+
+<details>
+<summary><b>Convert Formats</b></summary>
+
+```bash
+llmpeg "convert video.mov to mp4 with h264 codec"
+# Output: ffmpeg -i video.mov -c:v libx264 -c:a aac output.mp4
+```
+</details>
+
+<details>
+<summary><b>Resize Video</b></summary>
+
+```bash
+llmpeg "resize video to 720p maintaining aspect ratio"
+# Output: ffmpeg -i input.mp4 -vf scale=-1:720 output.mp4
+```
+</details>
+
+<details>
+<summary><b>Create GIF</b></summary>
+
+```bash
+llmpeg "create gif from video between 5-10 seconds"
+# Output: ffmpeg -i input.mp4 -ss 5 -t 5 -vf "fps=10,scale=320:-1:flags=lanczos" output.gif
+```
+</details>
+
+<details>
+<summary><b>Extract Frames</b></summary>
+
+```bash
+llmpeg "extract 1 frame per second as jpg images"
+# Output: ffmpeg -i input.mp4 -vf fps=1 frame_%04d.jpg
+```
+</details>
+
+### Audio Operations
+
+<details>
+<summary><b>Extract Audio</b></summary>
+
+```bash
+llmpeg "extract audio from video as mp3 320kbps"
+# Output: ffmpeg -i input.mp4 -vn -acodec mp3 -ab 320k output.mp3
+```
+</details>
+
+<details>
+<summary><b>Change Volume</b></summary>
+
+```bash
+llmpeg "increase audio volume by 50%"
+# Output: ffmpeg -i input.mp4 -af "volume=1.5" output.mp4
+```
+</details>
+
+### Advanced Operations
+
+<details>
+<summary><b>Batch Processing</b></summary>
+
+```bash
+llmpeg "convert all mp4 files to webm with vp9 codec"
+# Output: for f in *.mp4; do ffmpeg -i "$f" -c:v libvpx-vp9 "${f%.mp4}.webm"; done
+```
+</details>
+
+<details>
+<summary><b>Streaming</b></summary>
+
+```bash
+llmpeg "stream video to rtmp server"
+# Output: ffmpeg -re -i input.mp4 -c copy -f flv rtmp://server/live/stream
+```
+</details>
+
+## 🤖 Supported AI Models
+
+### OpenAI
+- `gpt-4o-mini` (default) - Fast and efficient
+- `gpt-4` - Most capable
+- `gpt-4-turbo` - Latest GPT-4 with vision
+- `gpt-3.5-turbo` - Fast and cost-effective
 
 ### Claude (Anthropic)
-- `claude-3-haiku-20240307` (default)
-- `claude-3-sonnet-20240229`
-- `claude-3-opus-20240229`
+- `claude-3-haiku-20240307` (default) - Fast and efficient
+- `claude-3-sonnet-20240229` - Balanced performance
+- `claude-3-opus-20240229` - Most capable
 
 ### Google Gemini
-- `gemini-1.5-flash` (default)
-- `gemini-1.5-pro`
-- `gemini-pro`
+- `gemini-1.5-flash` (default) - Fast multimodal
+- `gemini-1.5-pro` - Advanced reasoning
+- `gemini-pro` - Balanced performance
 
 ### Grok (xAI)
-- `grok-beta` (default)
+- `grok-beta` (default) - Latest model
 
-## Examples
+## ⚙️ Configuration
 
-### Video Conversion
+### Priority Order
+
+1. **CLI flags** (highest priority)
+2. **Environment variables**
+3. **Config file** (`~/.llmpeg/config.json`)
+4. **`.env` files**
+
+### Environment Variables
+
 ```bash
-llmpeg "convert MOV to MP4 with H.264 codec"
-# Output: ffmpeg -v quiet -stats -i input.mov -c:v libx264 output.mp4
+export OPENAI_API_KEY="your-key"
+export ANTHROPIC_API_KEY="your-key"
+export GOOGLE_GENERATIVE_AI_API_KEY="your-key"
+export XAI_API_KEY="your-key"
+export LLMPEG_DEFAULT_PROVIDER="claude"
 ```
 
-### Audio Extraction
-```bash
-llmpeg "extract audio from video and save as high quality mp3"
-# Output: ffmpeg -v quiet -stats -i input.mp4 -q:a 0 -map a output.mp3
-```
-
-### Video Resizing
-```bash
-llmpeg "resize video to 1280x720 maintaining aspect ratio"
-# Output: ffmpeg -v quiet -stats -i input.mp4 -vf scale=1280:720:force_original_aspect_ratio=decrease output.mp4
-```
-
-### GIF Creation
-```bash
-llmpeg "create gif from video between 5-10 seconds with 10fps"
-# Output: ffmpeg -v quiet -stats -i input.mp4 -ss 5 -t 5 -filter_complex "[0:v] fps=10,scale=480:-1,split [a][b];[a] palettegen [p];[b][p] paletteuse" output.gif
-```
-
-### Video Compression
-```bash
-llmpeg "compress video for web streaming with good quality"
-# Output: ffmpeg -v quiet -stats -i input.mp4 -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k output.mp4
-```
-
-### Batch Processing
-```bash
-llmpeg "convert all MP4 files in current directory to WebM"
-# Output: ffmpeg -v quiet -stats -i "*.mp4" -c:v libvpx-vp9 -c:a libopus "%~nf.webm"
-```
-
-## Environment Variables
-
-You can also set API keys using environment variables:
-
-- `OPENAI_API_KEY` - OpenAI API key
-- `ANTHROPIC_API_KEY` - Claude API key
-- `GOOGLE_GENERATIVE_AI_API_KEY` - Google Gemini API key
-- `XAI_API_KEY` - Grok API key
-
-## Configuration
-
-LLmpeg uses a flexible configuration system with the following priority order:
-
-1. **CLI flags** (highest priority) - Options passed directly to commands
-2. **Environment variables** - System environment variables
-3. **Config file** - `~/.llmpeg/config.json`
-4. **Env files** - `.env` files in current directory or home
-
-### Configuration File
-
-The main configuration file is stored at `~/.llmpeg/config.json`:
+### Config File Structure
 
 ```json
 {
@@ -207,22 +261,32 @@ The main configuration file is stored at `~/.llmpeg/config.json`:
     "apiKey": "your-claude-key",
     "defaultModel": "claude-3-haiku-20240307"
   },
+  "gemini": {
+    "apiKey": "your-gemini-key",
+    "defaultModel": "gemini-1.5-flash"
+  },
+  "grok": {
+    "apiKey": "your-grok-key",
+    "defaultModel": "grok-beta"
+  },
   "defaultProvider": "openai",
   "autoCopy": false
 }
 ```
 
-## Clipboard Support
+## 📋 Clipboard Support
 
-LLmpeg supports clipboard functionality across different platforms:
+### macOS
+Native support via `pbcopy`
 
-- **macOS**: Uses native `pbcopy`
-- **Windows**: Uses native `clip`
-- **Linux**: Automatically detects and uses `xclip`, `xsel`, or `wl-copy`
+### Windows
+Native support via `clip`
 
-For Linux users, install one of these clipboard utilities:
+### Linux
+Install one of these utilities:
+
 ```bash
-# Debian/Ubuntu
+# X11 users
 sudo apt-get install xclip
 # or
 sudo apt-get install xsel
@@ -231,86 +295,95 @@ sudo apt-get install xsel
 sudo apt-get install wl-clipboard
 ```
 
-## Tips
-
-1. **Be specific**: The more detailed your description, the better the generated command
-2. **Check commands**: Always review generated commands before execution
-3. **Use appropriate models**: Different models may excel at different types of tasks
-4. **Save commands**: Use `-c` to copy complex commands for later use
-5. **Auto-copy**: Enable auto-copy with `llmpeg config --auto-copy true` to copy all commands automatically
-
-## Development
+## 🛠️ Development
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/llmpeg
+# Clone repository
+git clone https://github.com/ali-master/llmpeg
 cd llmpeg
 
 # Install dependencies
 bun install
 
-# Run in development mode
-bun run start:dev
+# Development
+bun run start:dev        # Run in dev mode
+bun run start:cli:dev    # Run CLI in dev mode
 
-# Run tests
-bun test
-
-# Build for production
-bun run build
+# Build
+bun run build           # Build for production
+bun run test:types      # Type checking
+bun run format          # Format code
+bun run lint            # Lint code
 ```
 
-## API Key Security
+## 🤝 Contributing
 
-- API keys are stored locally in `~/.llmpeg/config.json`
-- Configuration file is never committed to version control
-- Environment variables override config file settings
-- Use environment-specific `.env` files for different environments
-- Keys are never sent anywhere except to the respective AI service
-
-## Troubleshooting
-
-### "No API key found" Error
-Make sure you've configured at least one API key:
-```bash
-llmpeg config --show
-```
-
-### Command Execution Fails
-- Ensure FFmpeg is installed on your system
-- Check that the generated command is valid
-- Use `-v` flag for verbose output
-
-### Model Errors
-- Verify your API key is valid
-- Check your API usage limits
-- Try a different model provider
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## 📈 Roadmap
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- [ ] Interactive mode for command refinement
+- [ ] Command history and favorites
+- [ ] Preset templates for common tasks
+- [ ] Integration with popular video platforms
+- [ ] Web interface
+- [ ] VSCode extension
 
-## Acknowledgments
+## 🐛 Troubleshooting
 
-- Built with [Vercel AI SDK](https://sdk.vercel.ai/)
-- Powered by [Bun](https://bun.sh/)
-- Uses models from OpenAI, Anthropic, Google, and xAI
+<details>
+<summary><b>No API key found</b></summary>
 
-## Support
+```bash
+# Check your configuration
+llmpeg config --show
 
-If you encounter any issues or have questions:
-- Open an issue on GitHub
-- Check the [documentation](https://github.com/yourusername/llmpeg/wiki)
+# Ensure at least one API key is set
+llmpeg config --openai YOUR_KEY
+```
+</details>
+
+<details>
+<summary><b>Command execution fails</b></summary>
+
+- Ensure FFmpeg is installed: `ffmpeg -version`
+- Use verbose mode: `llmpeg -v "your command"`
+- Check the generated command before executing
+</details>
+
+<details>
+<summary><b>Clipboard not working</b></summary>
+
+- **Linux**: Install `xclip`, `xsel`, or `wl-copy`
+- **WSL**: May need additional configuration
+- Use manual copy as fallback
+</details>
+
+## 📄 License
+
+MIT © [Ali Torki](https://github.com/ali-master)
+
+## 🙏 Acknowledgments
+
+- [Vercel AI SDK](https://sdk.vercel.ai/) - AI model integration
+- [Bun](https://bun.sh/) - JavaScript runtime
+- [Commander.js](https://github.com/tj/commander.js/) - CLI framework
+- [Chalk](https://github.com/chalk/chalk) - Terminal styling
 
 ---
 
-Made with ❤️ by [Ali Torki](https://github.com/ali-master), for developers. Happy encoding! 🎬
+<div align="center">
+  <p>
+    <sub>Built with ❤️ by <a href="https://github.com/ali-master" target="_blank">Ali Torki</a>, for developers. Happy encoding! 🎬</sub>
+  </p>
+  <p>
+    <a href="https://github.com/ali-master/llmpeg">⭐ Star us on GitHub</a> •
+    <a href="https://linkedin.com/in/alitorki">🐦 Follow on Linkedin</a>
+  </p>
+</div>
