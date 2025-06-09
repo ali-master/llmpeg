@@ -52,7 +52,6 @@
     "build:dts": "tsc --emitDeclarationOnly --declaration --noEmit false --outDir dist --project ./tsconfig.json",
     "build:main": "bun build src/index.ts --outdir dist --target node --format esm --minify",
     "build:cli": "bun build src/cli.ts --outdir dist --target node --format esm --minify && node -e \"const fs=require('fs');const f='dist/cli.js';const c=fs.readFileSync(f,'utf8');if(!c.startsWith('#!/usr/bin/env node'))fs.writeFileSync(f,'#!/usr/bin/env node\\\\n'+c)\"",
-    "postbuild": "chmod +x dist/cli.js",
     "start:dev": "bun --bun run src/index.ts",
     "start:cli:dev": "bun --bun run src/cli.ts",
     "prepublish:next": "bun run build",
@@ -70,12 +69,14 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.13.2",
     "@types/bun": "latest",
-    "@types/inquirer": "^9.0.8",
     "@types/figlet": "^1.7.0",
+    "@types/inquirer": "^9.0.8",
     "eslint": "^9.28.0",
     "eslint-plugin-format": "^1.0.1",
+    "only-allow": "^1.2.1",
     "prettier": "^3.5.3",
-    "release-it": "^19.0.3"
+    "release-it": "^19.0.3",
+    "rimraf": "^6.0.1"
   },
   "peerDependencies": {
     "typescript": "^5.7.3"
