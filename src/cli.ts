@@ -12,8 +12,8 @@ import { presetManager } from "./presets.js";
 import type { PresetParameter, Preset } from "./presets.js";
 import figlet from "figlet";
 import { vice } from "gradient-string";
-import { writeFileSync, mkdirSync, existsSync } from "fs";
-import { join } from "path";
+import fs, { writeFileSync, mkdirSync, existsSync } from "fs";
+import path, { join } from "path";
 import { homedir } from "os";
 import packageJSON from "../package.json" assert { type: "json" };
 import inquirer from "inquirer";
@@ -26,7 +26,7 @@ program
   .version(packageJSON.version, "--version", "Show version information")
   .option(
     "-m, --model <model>",
-    "AI model to use (openai, claude, gemini, grok)",
+    "AI model to use (openai, claude, gemini, grok)"
   )
   .option("-p, --provider <provider>", "Model provider specific variant")
   .option("-c, --copy", "Copy command to clipboard")
@@ -72,7 +72,7 @@ program
         } catch (error) {
           console.log(
             chalk.red("\n✗ Failed to copy to clipboard:"),
-            (error as Error).message,
+            (error as Error).message
           );
         }
       }
@@ -132,8 +132,8 @@ program
       console.log(chalk.gray(`   Location: ${configFile}`));
       console.log(
         chalk.gray(
-          "\n   Use --force flag to overwrite the existing configuration.",
-        ),
+          "\n   Use --force flag to overwrite the existing configuration."
+        )
       );
       process.exit(1);
     }
@@ -144,12 +144,12 @@ program
         mkdirSync(configPath, { recursive: true });
         console.log(
           chalk.green("✓ Created directory:"),
-          chalk.gray(configPath),
+          chalk.gray(configPath)
         );
       } catch (error) {
         console.error(
           chalk.red("Failed to create directory:"),
-          (error as Error).message,
+          (error as Error).message
         );
         process.exit(1);
       }
@@ -181,17 +181,17 @@ program
       writeFileSync(configFile, JSON.stringify(sampleConfig, null, 2));
       console.log(
         chalk.green("✓ Created configuration file:"),
-        chalk.gray(configFile),
+        chalk.gray(configFile)
       );
 
       console.log(chalk.cyan("\n📝 Sample configuration created!"));
       console.log(chalk.bold("\nNext steps:"));
       console.log(
-        chalk.gray("1. Edit the configuration file to add your API keys:"),
+        chalk.gray("1. Edit the configuration file to add your API keys:")
       );
       console.log(chalk.white(`   ${configFile}`));
       console.log(
-        chalk.gray("\n2. Or use the config command to set API keys:"),
+        chalk.gray("\n2. Or use the config command to set API keys:")
       );
       console.log(chalk.white("   llmpeg config --openai YOUR_KEY"));
       console.log(chalk.white("   llmpeg config --claude YOUR_KEY"));
@@ -204,7 +204,7 @@ program
     } catch (error) {
       console.error(
         chalk.red("Failed to create configuration file:"),
-        (error as Error).message,
+        (error as Error).message
       );
       process.exit(1);
     }
@@ -219,16 +219,16 @@ program
   .option("--grok <key>", "Set Grok API key")
   .option(
     "--default-provider <provider>",
-    "Set default AI provider (openai, claude, gemini, grok)",
+    "Set default AI provider (openai, claude, gemini, grok)"
   )
   .option(
     "--default-model <model>",
-    "Set default model for the current provider",
+    "Set default model for the current provider"
   )
   .option("--show", "Show current configuration (keys are masked)")
   .option(
     "--auto-copy <value>",
-    "Enable/disable automatic clipboard copy (true/false)",
+    "Enable/disable automatic clipboard copy (true/false)"
   )
   .action(async (options) => {
     if (options.show) {
@@ -239,43 +239,43 @@ program
       console.log(chalk.bold("API Keys:"));
       console.log(
         "  OpenAI:",
-        config.openai?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set"),
+        config.openai?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set")
       );
       console.log(
         "  Claude:",
-        config.claude?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set"),
+        config.claude?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set")
       );
       console.log(
         "  Gemini:",
-        config.gemini?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set"),
+        config.gemini?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set")
       );
       console.log(
         "  Grok:",
-        config.grok?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set"),
+        config.grok?.apiKey ? chalk.green("✓ Set") : chalk.red("✗ Not set")
       );
 
       console.log(chalk.bold("\nDefaults:"));
       console.log(
         "  Default Provider:",
-        chalk.yellow(config.defaultProvider || "openai"),
+        chalk.yellow(config.defaultProvider || "openai")
       );
 
       if (config.openai?.defaultModel) {
         console.log(
           "  OpenAI Model:",
-          chalk.yellow(config.openai.defaultModel),
+          chalk.yellow(config.openai.defaultModel)
         );
       }
       if (config.claude?.defaultModel) {
         console.log(
           "  Claude Model:",
-          chalk.yellow(config.claude.defaultModel),
+          chalk.yellow(config.claude.defaultModel)
         );
       }
       if (config.gemini?.defaultModel) {
         console.log(
           "  Gemini Model:",
-          chalk.yellow(config.gemini.defaultModel),
+          chalk.yellow(config.gemini.defaultModel)
         );
       }
       if (config.grok?.defaultModel) {
@@ -291,7 +291,7 @@ program
       console.log(chalk.bold("\nSettings:"));
       console.log(
         "  Auto-copy:",
-        config.autoCopy ? chalk.green("✓ Enabled") : chalk.gray("✗ Disabled"),
+        config.autoCopy ? chalk.green("✓ Enabled") : chalk.gray("✗ Disabled")
       );
       return;
     }
@@ -318,10 +318,10 @@ program
       const validProviders = ["openai", "claude", "gemini", "grok"];
       if (!validProviders.includes(options.defaultProvider.toLowerCase())) {
         console.error(
-          chalk.red(`Invalid provider: ${options.defaultProvider}`),
+          chalk.red(`Invalid provider: ${options.defaultProvider}`)
         );
         console.error(
-          chalk.gray(`Valid providers: ${validProviders.join(", ")}`),
+          chalk.gray(`Valid providers: ${validProviders.join(", ")}`)
         );
         process.exit(1);
       }
@@ -333,8 +333,8 @@ program
       configManager.setDefaultModel(currentProvider, options.defaultModel);
       console.log(
         chalk.gray(
-          `Set default model for ${currentProvider}: ${options.defaultModel}`,
-        ),
+          `Set default model for ${currentProvider}: ${options.defaultModel}`
+        )
       );
       updated = true;
     }
@@ -348,7 +348,7 @@ program
     if (updated) {
       await configManager.save();
       console.log(
-        chalk.green("✓ Configuration saved to ~/.llmpeg/config.json"),
+        chalk.green("✓ Configuration saved to ~/.llmpeg/config.json")
       );
     } else {
       console.log(chalk.yellow("No configuration changes made."));
@@ -408,7 +408,7 @@ program
       console.log(`\nCommands today: ${chalk.bold(stats.commandsToday)}`);
       console.log(`Commands this week: ${chalk.bold(stats.commandsThisWeek)}`);
       console.log(
-        `Commands this month: ${chalk.bold(stats.commandsThisMonth)}`,
+        `Commands this month: ${chalk.bold(stats.commandsThisMonth)}`
       );
       return;
     }
@@ -462,11 +462,11 @@ program
         entry.tags.length > 0 ? chalk.gray(` [${entry.tags.join(", ")}]`) : "";
 
       console.log(
-        `${favorite} ${chalk.bold(`${index + 1}.`)} ${chalk.cyan(entry.prompt)}${tags}`,
+        `${favorite} ${chalk.bold(`${index + 1}.`)} ${chalk.cyan(entry.prompt)}${tags}`
       );
       console.log(`   ${chalk.green(entry.command)}`);
       console.log(
-        `   ${chalk.gray(date)} · ${entry.provider} · Used ${entry.executionCount}x`,
+        `   ${chalk.gray(date)} · ${entry.provider} · Used ${entry.executionCount}x`
       );
       console.log();
     });
@@ -505,7 +505,7 @@ async function interactiveHistoryBrowser() {
       console.log(`\nCommands today: ${chalk.bold(stats.commandsToday)}`);
       console.log(`Commands this week: ${chalk.bold(stats.commandsThisWeek)}`);
       console.log(
-        `Commands this month: ${chalk.bold(stats.commandsThisMonth)}\n`,
+        `Commands this month: ${chalk.bold(stats.commandsThisMonth)}\n`
       );
 
       await inquirer.prompt([
@@ -606,15 +606,15 @@ async function interactiveHistoryBrowser() {
     console.log(`${chalk.bold("Prompt:")} ${entry.prompt}`);
     console.log(`${chalk.bold("Command:")} ${chalk.green(entry.command)}`);
     console.log(
-      `${chalk.bold("Provider:")} ${entry.provider}${entry.model ? ` (${entry.model})` : ""}`,
+      `${chalk.bold("Provider:")} ${entry.provider}${entry.model ? ` (${entry.model})` : ""}`
     );
     console.log(
-      `${chalk.bold("Date:")} ${new Date(entry.timestamp).toLocaleString()}`,
+      `${chalk.bold("Date:")} ${new Date(entry.timestamp).toLocaleString()}`
     );
     console.log(`${chalk.bold("Used:")} ${entry.executionCount} times`);
     console.log(`${chalk.bold("Tags:")} ${entry.tags.join(", ") || "none"}`);
     console.log(
-      `${chalk.bold("Favorite:")} ${entry.isFavorite ? "Yes ★" : "No"}`,
+      `${chalk.bold("Favorite:")} ${entry.isFavorite ? "Yes ★" : "No"}`
     );
     if (entry.category) {
       console.log(`${chalk.bold("Category:")} ${entry.category}`);
@@ -666,7 +666,7 @@ async function interactiveHistoryBrowser() {
         {
           stdio: "inherit",
           shell: true,
-        },
+        }
       );
 
       await new Promise((resolve) => {
@@ -695,9 +695,7 @@ async function interactiveHistoryBrowser() {
     } else if (commandAction === "favorite") {
       const isFavorite = historyManager.toggleFavorite(entry.id);
       console.log(
-        chalk.green(
-          `\n✓ ${isFavorite ? "Added to" : "Removed from"} favorites`,
-        ),
+        chalk.green(`\n✓ ${isFavorite ? "Added to" : "Removed from"} favorites`)
       );
       await inquirer.prompt([
         {
@@ -844,7 +842,7 @@ function displayPresetList(presets: Preset[]) {
 
         const common = preset.commonUse ? chalk.yellow("★") : " ";
         console.log(
-          `  ${common} ${difficulty} ${chalk.bold(preset.name)} - ${chalk.gray(preset.description)}`,
+          `  ${common} ${difficulty} ${chalk.bold(preset.name)} - ${chalk.gray(preset.description)}`
         );
         console.log(`     ${chalk.gray(`ID: ${preset.id}`)}`);
       });
@@ -852,8 +850,8 @@ function displayPresetList(presets: Preset[]) {
 
   console.log(
     chalk.gray(
-      "\n★ = Common use | ● = Difficulty (green=easy, yellow=medium, red=hard)",
-    ),
+      "\n★ = Common use | ● = Difficulty (green=easy, yellow=medium, red=hard)"
+    )
   );
 }
 
@@ -954,7 +952,7 @@ async function usePreset(presetId: string) {
       } catch (error) {
         console.log(
           chalk.red("\n✗ Failed to copy to clipboard:"),
-          (error as Error).message,
+          (error as Error).message
         );
       }
     }
@@ -1451,10 +1449,10 @@ async function manageCustomPresets() {
   customPresets.forEach((preset: any) => {
     console.log(`${chalk.bold(preset.name)} - ${preset.description}`);
     console.log(
-      `  Category: ${preset.category} | Used: ${preset.usageCount} times`,
+      `  Category: ${preset.category} | Used: ${preset.usageCount} times`
     );
     console.log(
-      `  Created: ${new Date(preset.createdAt).toLocaleDateString()}`,
+      `  Created: ${new Date(preset.createdAt).toLocaleDateString()}`
     );
     console.log();
   });
@@ -1468,18 +1466,33 @@ async function manageCustomPresets() {
   ]);
 }
 
-console.log(`
-${vice(
-  figlet.textSync("LLMPEG", {
-    font: "ANSI Shadow",
-    horizontalLayout: "default",
-    verticalLayout: "default",
-  }),
-)}
+// Absolute path to font inside figlet package
+const fontPath = path.resolve(
+  __dirname,
+  "../node_modules/figlet/fonts/ANSI Shadow.flf"
+);
 
-Author: Ali Torki
-Github: https://github.com/ali-master/llmpeg
-`);
+// Safely load and register font
+try {
+  const fontData = fs.readFileSync(fontPath, "utf8");
+  figlet.parseFont("ANSI Shadow", fontData);
+} catch (err) {
+  console.warn("⚠️  Could not load custom font. Falling back to default.");
+}
+
+let output;
+try {
+  output = figlet.textSync("LLMPEG", { font: "ANSI Shadow" });
+} catch (e) {
+  console.warn("❗ Custom font not found. Falling back.");
+  output = figlet.textSync("LLMPEG", { font: "Standard" });
+}
+console.log(
+  `\n${vice(output)} 
+
+  Author: Ali Torki 
+  Github: https://github.com/ali-master/llmpeg`
+);
 
 // Check if any API key is configured
 if (!configManager.hasAnyApiKey()) {
